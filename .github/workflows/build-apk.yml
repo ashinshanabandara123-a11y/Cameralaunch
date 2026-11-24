@@ -52,7 +52,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.7'
+          gradle-version: '8.9'   # ← 8.7 සිට 8.9 ට වෙනස් කළා
 
       - name: Build Debug APK
         run: cd "$PROJECT_DIR" && gradle assembleDebug --stacktrace
