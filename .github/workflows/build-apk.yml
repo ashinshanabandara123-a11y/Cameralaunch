@@ -12,16 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract Android Studio ZIP
+      - name: Extract ZIP
         run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
           unzip -o SamsungStockCameraLauncher_AndroidStudio.zip -d extracted
           cp -r extracted/SamsungStockCameraLauncher/. .
 
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
+      - name: Verify Project
+        run: |
+          ls -la
+          ls -la app
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -29,13 +36,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install SDK Packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --stacktrace
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Samsung-Stock-Camera-APK
