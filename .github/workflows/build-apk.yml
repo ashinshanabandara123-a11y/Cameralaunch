@@ -25,11 +25,11 @@ jobs:
           echo "✅ Found zip: $ZIP"
           mkdir -p _project
           unzip -o "$ZIP" -d _project
-          GRADLEW=$(find _project -name gradlew -type f | head -n 1)
-          if [ -z "$GRADLEW" ]; then
-            echo "❌ gradlew not found after extraction"; exit 1
+          BUILD_GRADLE=$(find _project -name "build.gradle*" -type f | head -n 1)
+          if [ -z "$BUILD_GRADLE" ]; then
+            echo "❌ build.gradle not found after extraction"; exit 1
           fi
-          DIR=$(dirname "$GRADLEW")
+          DIR=$(dirname "$BUILD_GRADLE")
           echo "PROJECT_DIR=$DIR" >> $GITHUB_ENV
           echo "✅ Project directory: $DIR"
 
@@ -45,14 +45,13 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle cache
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x "$PROJECT_DIR/gradlew"
+        with:
+          gradle-version: '8.7'
 
       - name: Build Debug APK
-        run: cd "$PROJECT_DIR" && ./gradlew assembleDebug --stacktrace
+        run: cd "$PROJECT_DIR" && gradle assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
