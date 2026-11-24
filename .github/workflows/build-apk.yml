@@ -33,6 +33,18 @@ jobs:
           echo "PROJECT_DIR=$DIR" >> $GITHUB_ENV
           echo "✅ Project directory: $DIR"
 
+      - name: Force Gradle wrapper version to 8.9
+        run: |
+          WRAPPER="$PROJECT_DIR/gradle/wrapper/gradle-wrapper.properties"
+          if [ -f "$WRAPPER" ]; then
+            sed -i 's|gradle-[0-9.]*-all.zip|gradle-8.9-all.zip|' "$WRAPPER"
+            sed -i 's|gradle-[0-9.]*-bin.zip|gradle-8.9-bin.zip|' "$WRAPPER"
+            echo "✅ Wrapper updated:"
+            grep distributionUrl "$WRAPPER"
+          else
+            echo "⚠️ No wrapper found, skipping"
+          fi
+
       - name: Remove local.properties if exists
         run: rm -f "$PROJECT_DIR/local.properties"
 
@@ -52,7 +64,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'   # ← 8.7 සිට 8.9 ට වෙනස් කළා
+          gradle-version: '8.9'
 
       - name: Build Debug APK
         run: cd "$PROJECT_DIR" && gradle assembleDebug --stacktrace
